@@ -66,8 +66,8 @@ function getMaxCalories(elves) {
 }
 
 assertEquals(
-  24000,
   getMaxCalories(parseInput(TEST_INPUT)),
+  24000,
   "Part 1, test input"
 );
 
@@ -99,7 +99,7 @@ function part2(input) {
   return top3.reduce((acc, curr) => acc + curr, 0);
 }
 
-assertEquals(45000, part2(TEST_INPUT), "Part 2, test input");
+assertEquals(part2(TEST_INPUT), 45000, "Part 2, test input");
 
 const part2Answer = part2(PUZZLE_INPUT);
 console.log("Part 2 answer:", part2Answer);
