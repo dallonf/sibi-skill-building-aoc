@@ -14,11 +14,11 @@ export function assertTrue(condition, message) {
 /**
  * @template T
  *
- * @param {T} expected
  * @param {T} actual
+ * @param {T} expected
  * @param {string} [message]
  */
-export function assertEquals(expected, actual, message) {
+export function assertEquals(actual, expected, message) {
   let assertMessage = `Expected ${expected} to equal ${actual}; actually was ${actual}`;
   if (message) {
     assertMessage = `${message}. ${assertMessage}`;
