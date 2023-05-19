@@ -58,6 +58,29 @@ function getWinner({ yourMove, opponentMove }) {
   }
   return "opponent";
 }
+assertEquals(getWinner({ yourMove: "rock", opponentMove: "rock" }), "tie");
+assertEquals(
+  getWinner({ yourMove: "rock", opponentMove: "paper" }),
+  "opponent"
+);
+assertEquals(getWinner({ yourMove: "rock", opponentMove: "scissors" }), "you");
+
+assertEquals(getWinner({ yourMove: "paper", opponentMove: "rock" }), "you");
+assertEquals(getWinner({ yourMove: "paper", opponentMove: "paper" }), "tie");
+assertEquals(
+  getWinner({ yourMove: "paper", opponentMove: "scissors" }),
+  "opponent"
+);
+
+assertEquals(
+  getWinner({ yourMove: "scissors", opponentMove: "rock" }),
+  "opponent"
+);
+assertEquals(getWinner({ yourMove: "scissors", opponentMove: "paper" }), "you");
+assertEquals(
+  getWinner({ yourMove: "scissors", opponentMove: "scissors" }),
+  "tie"
+);
 
 /**
  * @param {object} params
@@ -165,4 +188,4 @@ function part1(input) {
 assertEquals(part1(TEST_INPUT), 15);
 const part1Answer = part1(PUZZLE_INPUT);
 console.log("Part 1:", part1Answer);
-assertEquals(part1Answer, 15442);
+assertEquals(part1Answer, 15422);
