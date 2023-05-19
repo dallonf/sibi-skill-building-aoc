@@ -38,25 +38,47 @@ function parseInput(input) {
 }
 
 /**
+ * @param {Move} move
+ */
+function getWinningResponse(move) {
+  switch (move) {
+    case "rock":
+      return "paper";
+    case "paper":
+      return "scissors";
+    case "scissors":
+      return "rock";
+  }
+}
+
+/**
+ * @param {Move} move
+ */
+function getLosingResponse(move) {
+  switch (move) {
+    case "rock":
+      return "scissors";
+    case "paper":
+      return "rock";
+    case "scissors":
+      return "paper";
+  }
+}
+
+/**
  * @param {object} params
  * @param {Move} params.yourMove
  * @param {Move} params.opponentMove
  * @returns {'you' | 'opponent' | 'tie'}
  */
 function getWinner({ yourMove, opponentMove }) {
-  if (yourMove === opponentMove) {
-    return "tie";
-  }
-  if (yourMove === "rock" && opponentMove === "scissors") {
+  if (yourMove === getWinningResponse(opponentMove)) {
     return "you";
   }
-  if (yourMove === "paper" && opponentMove === "rock") {
-    return "you";
+  if (yourMove === getLosingResponse(opponentMove)) {
+    return "opponent";
   }
-  if (yourMove === "scissors" && opponentMove === "paper") {
-    return "you";
-  }
-  return "opponent";
+  return "tie";
 }
 assertEquals(getWinner({ yourMove: "rock", opponentMove: "rock" }), "tie");
 assertEquals(
@@ -130,10 +152,13 @@ function getScore({ yourMove, opponentMove }) {
 }
 
 /**
+ * During Part 1, we mistakenly believed the X/Y/Z corresponded to
+ * our rock/paper/scissors move.
+ *
  * @param {StrategyEntry} entry
  * @returns {number}
  */
-function getScoreForEntry(entry) {
+function getScoreForEntryMistaken(entry) {
   const [strategyOpponentMove, strategyYourMove] = entry;
   /** @type {Move} */
   let opponentMove;
@@ -182,10 +207,74 @@ function getScoreForEntry(entry) {
  */
 function part1(input) {
   const strategyGuide = parseInput(input);
-  return strategyGuide.map(getScoreForEntry).reduce((a, b) => a + b, 0);
+  return strategyGuide.map(getScoreForEntryMistaken).reduce((a, b) => a + b, 0);
 }
 
 assertEquals(part1(TEST_INPUT), 15);
 const part1Answer = part1(PUZZLE_INPUT);
 console.log("Part 1:", part1Answer);
 assertEquals(part1Answer, 15422);
+
+/**
+ * @param {StrategyEntry} entry
+ * @returns {number}
+ */
+function getScoreForEntry(entry) {
+  const [strategyOpponentMove, strategyYourMove] = entry;
+  /** @type {Move} */
+  let opponentMove;
+  switch (strategyOpponentMove) {
+    case "A":
+      opponentMove = "rock";
+      break;
+    case "B":
+      opponentMove = "paper";
+      break;
+    case "C":
+      opponentMove = "scissors";
+      break;
+    default: {
+      /** @type {never} */
+      const _exhaustive = strategyOpponentMove;
+      return _exhaustive;
+    }
+  }
+
+  /** @type {Move} */
+  let yourMove;
+  switch (strategyYourMove) {
+    case "X":
+      // lose
+      yourMove = getLosingResponse(opponentMove);
+      break;
+    case "Y":
+      // draw
+      yourMove = opponentMove;
+      break;
+    case "Z":
+      // win
+      yourMove = getWinningResponse(opponentMove);
+      break;
+    default: {
+      /** @type {never} */
+      const _exhaustive = strategyYourMove;
+      return _exhaustive;
+    }
+  }
+
+  return getScore({ yourMove, opponentMove });
+}
+
+/**
+ * @param {string} input
+ * @returns {number}
+ */
+function part2(input) {
+  const strategyGuide = parseInput(input);
+  return strategyGuide.map(getScoreForEntry).reduce((a, b) => a + b, 0);
+}
+
+assertEquals(part2(TEST_INPUT), 12);
+const part2Answer = part2(PUZZLE_INPUT);
+console.log("Part 2:", part2Answer);
+assertEquals(part2Answer, 15442);
