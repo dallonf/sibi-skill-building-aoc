@@ -109,6 +109,13 @@ assertEquals(part1Answer, 8243);
 
 /**
  * Streams each group of elves' rucksacks.
+ * 
+ * Note: why a generator (function*)? Mostly I just wanted to play with the idea.
+ * In theory, it would be more efficient, allowing us to process each group one at a time
+ * rather than having every group of groups in memory.
+ * In practice, it's overengineered, and I wouldn't do this in production code.
+ * However, there's a proposal for utility functions like map/filter/reduce on iterators,
+ * which would make this more useful!
  *
  * @param {string[]} rucksacks
  * @param {number} groupSize
