@@ -1,3 +1,5 @@
+// Day 3: Rucksack Reorganization
+
 import { readTextFile, splitLines } from "../utils/files.js";
 import { assertDeepEquals, assertEquals, assertTrue } from "../utils/assert.js";
 
@@ -104,3 +106,83 @@ assertEquals(partOne(TEST_INPUT), 157);
 const part1Answer = partOne(PUZZLE_INPUT);
 console.log("Part 1:", part1Answer);
 assertEquals(part1Answer, 8243);
+
+/**
+ * Streams each group of elves' rucksacks.
+ *
+ * @param {string[]} rucksacks
+ * @param {number} groupSize
+ * @yields {string[]}
+ */
+function* streamRucksackGroups(rucksacks, groupSize = 3) {
+  let currentGroup = [];
+  for (const rucksack of rucksacks) {
+    currentGroup.push(rucksack);
+    if (currentGroup.length === groupSize) {
+      yield currentGroup;
+      currentGroup = [];
+    }
+  }
+  if (currentGroup.length > 0) {
+    throw new Error(
+      `${currentGroup.length} rucksacks left over at the end of the stream`
+    );
+  }
+}
+
+assertDeepEquals(streamRucksackGroups(TEST_RUCKSACKS).next().value ?? null, [
+  "vJrwpWtwJgWrhcsFMMfFFhFp",
+  "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
+  "PmmdzqPrVvPwwTWBwg",
+]);
+
+/**
+ * Finds the identification badge; the item that is in all rucksacks in the group.
+ *
+ * @param {string[]} rucksackGroup
+ * @returns {string | null}
+ */
+function findIdentificationBadge(rucksackGroup) {
+  const firstRucksackItems = [...rucksackGroup[0]];
+  const set = new Set(firstRucksackItems);
+  for (const rucksack of rucksackGroup.slice(1)) {
+    const rucksackSet = new Set([...rucksack]);
+    for (const item of set) {
+      if (!rucksackSet.has(item)) {
+        set.delete(item);
+      }
+    }
+  }
+  if (set.size === 1) {
+    return [...set.values()][0];
+  }
+  return null;
+}
+
+const TEST_RUCKSACK_GROUPS = [...streamRucksackGroups(TEST_RUCKSACKS)];
+assertEquals(findIdentificationBadge(TEST_RUCKSACK_GROUPS[0]), "r");
+assertEquals(findIdentificationBadge(TEST_RUCKSACK_GROUPS[1]), "Z");
+
+/**
+ * @param {string} input
+ * @returns {number}
+ */
+function partTwo(input) {
+  const rucksacks = splitLines(input);
+  const rucksackGroups = [...streamRucksackGroups(rucksacks)];
+  const identificationBadges = rucksackGroups.map((group) => {
+    const badge = findIdentificationBadge(group);
+    if (!badge) {
+      throw new Error(`No identification badge in group: ${group}`);
+    }
+    return badge;
+  });
+  const priorities = identificationBadges.map(getPriority);
+  return priorities.reduce((a, b) => a + b, 0);
+}
+
+assertEquals(partTwo(TEST_INPUT), 70);
+
+const part2Answer = partTwo(PUZZLE_INPUT);
+console.log("Part 2:", part2Answer);
+assertEquals(part2Answer, 2631);
