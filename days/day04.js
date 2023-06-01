@@ -101,3 +101,39 @@ assertEquals(partOne(TEST_INPUT_PARSED), 2);
 const partOneAnswer = partOne(PUZZLE_INPUT_PARSED);
 console.log("Part one:", partOneAnswer);
 assertEquals(partOneAnswer, 305);
+
+/**
+ * Does the two ranges overlap?
+ *
+ * @param {Range} a
+ * @param {Range} b
+ * @returns {boolean}
+ */
+function rangesOverlap(a, b) {
+  return (
+    rangeContainsNumber(a, b.start) ||
+    rangeContainsNumber(a, b.end) ||
+    rangeContainsNumber(b, a.start) ||
+    rangeContainsNumber(b, a.end)
+  );
+}
+assertEquals(rangesOverlap(parseRange("5-7"), parseRange("7-9")), true);
+assertEquals(rangesOverlap(parseRange("7-9"), parseRange("5-7")), true);
+assertEquals(rangesOverlap(parseRange("2-8"), parseRange("3-7")), true);
+assertEquals(rangesOverlap(parseRange("2-4"), parseRange("6-8")), false);
+assertEquals(rangesOverlap(parseRange("2-3"), parseRange("4-5")), false);
+
+/**
+ * In how many pairs do the ranges overlap?
+ * @param {RangePair[]} pairs
+ * @returns {number}
+ */
+function partTwo(pairs) {
+  return pairs.filter(([a, b]) => rangesOverlap(a, b)).length;
+}
+
+assertEquals(partTwo(TEST_INPUT_PARSED), 4);
+
+const partTwoAnswer = partTwo(PUZZLE_INPUT_PARSED);
+console.log("Part two:", partTwoAnswer);
+assertEquals(partTwoAnswer, 811);
