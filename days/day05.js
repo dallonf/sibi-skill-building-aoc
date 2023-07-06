@@ -139,11 +139,13 @@ assertDeepEquals(moveContainer(TEST_INPUT_PARSED.stacks, 2, 1), [
 ]);
 
 /**
+ * The 9000 model moves one crate a time.
+ *
  * @param {ContainerStacks} stacks
  * @param {Instruction} instruction
  * @returns {ContainerStacks}
  */
-function followInstruction(stacks, instruction) {
+function followInstructionModel9000(stacks, instruction) {
   const { numberToMove, from, to } = instruction;
   let result = stacks;
   for (let i = 0; i < numberToMove; i += 1) {
@@ -153,16 +155,21 @@ function followInstruction(stacks, instruction) {
 }
 
 /**
+ * The 9000 model moves one crate a time.
+ *
  * @param {ContainerStacks} stacks
  * @param {Instruction[]} instructions
  * @returns {ContainerStacks}
  */
-function followInstructions(stacks, instructions) {
-  return instructions.reduce(followInstruction, stacks);
+function followInstructionsModel9000(stacks, instructions) {
+  return instructions.reduce(followInstructionModel9000, stacks);
 }
 
 assertDeepEquals(
-  followInstructions(TEST_INPUT_PARSED.stacks, TEST_INPUT_PARSED.instructions),
+  followInstructionsModel9000(
+    TEST_INPUT_PARSED.stacks,
+    TEST_INPUT_PARSED.instructions
+  ),
   [["C"], ["M"], ["P", "D", "N", "Z"]]
 );
 
@@ -180,7 +187,10 @@ function getTopContainersString(stacks) {
 
 assertDeepEquals(
   getTopContainersString(
-    followInstructions(TEST_INPUT_PARSED.stacks, TEST_INPUT_PARSED.instructions)
+    followInstructionsModel9000(
+      TEST_INPUT_PARSED.stacks,
+      TEST_INPUT_PARSED.instructions
+    )
   ),
   "CMZ"
 );
@@ -192,7 +202,7 @@ assertDeepEquals(
 function partOne(input) {
   const parsedInput = parseInput(input);
   const result = getTopContainersString(
-    followInstructions(parsedInput.stacks, parsedInput.instructions)
+    followInstructionsModel9000(parsedInput.stacks, parsedInput.instructions)
   );
   return result;
 }
@@ -202,3 +212,62 @@ assertEquals(partOne(TEST_INPUT), "CMZ");
 const partOneAnswer = partOne(PUZZLE_INPUT);
 console.log("Part one:", partOneAnswer);
 assertEquals(partOneAnswer, "FWNSHLDNZ");
+
+/**
+ * The 9001 model can move multiple crates at once.
+ *
+ * @param {ContainerStacks} stacks
+ * @param {Instruction} instruction
+ * @returns {ContainerStacks}
+ */
+function followInstructionModel9001(stacks, instruction) {
+  const { from, to, numberToMove } = instruction;
+  const fromIndex = from - 1;
+  const toIndex = to - 1;
+  const movedContainers = stacks[fromIndex].slice(-numberToMove);
+  return stacks.map((stack, index) => {
+    if (index === fromIndex) {
+      return stack.slice(0, -numberToMove);
+    }
+    if (index === toIndex) {
+      return [...stack, ...movedContainers];
+    }
+    return stack;
+  });
+}
+
+assertDeepEquals(
+  followInstructionModel9001(TEST_INPUT_PARSED.stacks, {
+    numberToMove: 1,
+    from: 2,
+    to: 1,
+  }),
+  [["Z", "N", "D"], ["M", "C"], ["P"]]
+);
+assertDeepEquals(
+  followInstructionModel9001([["Z", "N", "D"], ["M", "C"], ["P"]], {
+    numberToMove: 3,
+    from: 1,
+    to: 3,
+  }),
+  [[], ["M", "C"], ["P", "Z", "N", "D"]]
+);
+
+/**
+ * @param {string} input
+ * @returns {string}
+ */
+function partTwo(input) {
+  const { instructions, stacks } = parseInput(input);
+  const resultingStacks = instructions.reduce(
+    followInstructionModel9001,
+    stacks
+  );
+  return getTopContainersString(resultingStacks);
+}
+
+assertDeepEquals(partTwo(TEST_INPUT), "MCD");
+
+const partTwoAnswer = partTwo(PUZZLE_INPUT);
+console.log("Part two:", partTwoAnswer);
+assertEquals(partTwoAnswer, "RNRGDNFQG");
