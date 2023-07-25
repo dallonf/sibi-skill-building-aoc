@@ -20,25 +20,35 @@ function areAllCharactersDifferent(input) {
 }
 
 /**
+ * A marker is N consecutive characters that are all different.
+ *
+ * @param {string} input
+ * @param {number} length
+ */
+function indexOfMarker(input, length) {
+  const charBuffer = [];
+  const chars = input.split("");
+  for (let i = 0; i < chars.length; i++) {
+    charBuffer.push(chars[i]);
+    while (charBuffer.length > length) {
+      charBuffer.shift();
+    }
+
+    if (charBuffer.length === length && areAllCharactersDifferent(charBuffer)) {
+      return i + 1;
+    }
+  }
+  return null;
+}
+
+/**
  * A start-of-packet marker is four consecutive different characters.
  *
  * @param {string} input
  * @returns {number | null} returns null if no start-of-packet marker is found
  */
 function indexOfStartOfPacketMarker(input) {
-  const charBuffer = [];
-  const chars = input.split("");
-  for (let i = 0; i < chars.length; i++) {
-    charBuffer.push(chars[i]);
-    while (charBuffer.length > 4) {
-      charBuffer.shift();
-    }
-
-    if (charBuffer.length === 4 && areAllCharactersDifferent(charBuffer)) {
-      return i + 1;
-    }
-  }
-  return null;
+  return indexOfMarker(input, 4);
 }
 
 assertEquals(indexOfStartOfPacketMarker("mjqjpqmgbljsphdztnvjfqwrcgsmlb"), 7);
@@ -56,3 +66,29 @@ assertEquals(
 const partOneAnswer = indexOfStartOfPacketMarker(PUZZLE_INPUT);
 console.log("Part one:", partOneAnswer);
 assertEquals(partOneAnswer, 1093);
+
+/**
+ * A start-of-message marker is fourteen consecutive different characters.
+ *
+ * @param {string} input
+ * @returns {number | null} returns null if no start-of-message marker is found
+ */
+function indexOfStartOfMessageMarker(input) {
+  return indexOfMarker(input, 14);
+}
+
+assertEquals(indexOfStartOfMessageMarker("mjqjpqmgbljsphdztnvjfqwrcgsmlb"), 19);
+assertEquals(indexOfStartOfMessageMarker("bvwbjplbgvbhsrlpgdmjqwftvncz"), 23);
+assertEquals(indexOfStartOfMessageMarker("nppdvjthqldpwncqszvftbrmjlhg"), 23);
+assertEquals(
+  indexOfStartOfMessageMarker("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"),
+  29
+);
+assertEquals(
+  indexOfStartOfMessageMarker("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"),
+  26
+);
+
+const partTwoAnswer = indexOfStartOfMessageMarker(PUZZLE_INPUT);
+console.log("Part two:", partTwoAnswer);
+assertEquals(partTwoAnswer, 3534);
